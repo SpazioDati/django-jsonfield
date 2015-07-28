@@ -78,7 +78,8 @@ class JSONFieldBase(six.with_metaclass(SubfieldBase, models.Field)):
                         try:
                             return json.loads(value, **self.load_kwargs)
                         except ValueError:
-                            raise ValidationError(_("Enter valid JSON"))
+                            # raise ValidationError(_("Enter valid JSON"))
+                            return value
 
         except AttributeError:
             # south fake meta class doesn't create proper attributes
@@ -151,6 +152,9 @@ class JSONField(JSONFieldBase, models.TextField):
     form_class = JSONFormField
 
     def dumps_for_display(self, value):
+        if isinstance(value, six.string_types):
+            return value
+
         kwargs = { "indent": 2 }
         kwargs.update(self.dump_kwargs)
         return json.dumps(value, **kwargs)
